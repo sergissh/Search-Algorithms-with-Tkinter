@@ -13,8 +13,6 @@ class Application:
         self.header = Header(self.root)
         self.body = Body(self.root)
         self.root.mainloop()
-        
-
 
 app = Application()
 
