@@ -1,5 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter.messagebox import showwarning
+from PIL import Image, ImageTk
+from body import Body
 class Header(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -7,7 +10,6 @@ class Header(tk.Frame):
         self.master = master
         self.configure(width=self.header_width, relief="solid", bg="yellow")
         self.place(x=0, y=0, relheight=1, width=self.header_width)
-
         self.initializeGraphSection()
         self.addHorizontalSeparator()
 
@@ -24,7 +26,6 @@ class Header(tk.Frame):
         #Create Canvas border
         border_canvas = tk.Canvas(self, width=2, bg="black", bd=0, highlightthickness=0)
         border_canvas.place(x=self.header_width-1, y=0, relheight=1)
-
 
     def addHorizontalSeparator(self):
         separator = ttk.Separator(self, orient='horizontal')
@@ -135,45 +136,38 @@ class Header(tk.Frame):
 
     def createNewGraph(self):
 
-        #Function that validates that the input is a number
-        def onValidate(P, entry):
-            if not validate_input(P):
-                entry.set("".join(filter(str.isdigit(), P)))
-        def validate_input(P):
-            if P == "":
-                return True
-            if P.isdigit():
-                return True
+        def checkGraph():
+            body = newWindow.master.master.body
+            nodes = entry1.get()
+            edges = entry2.get()
+            if not nodes.isdigit() or not edges.isdigit():
+                showwarning(title="Error", message="Enter an Integer")
             else:
-                return False
-        #Obtain entry values of Esges and Nodes, when submitting the form
-        def getNodesEdges():
-            entry1.get()
-            entry2.get()
-
+                body.createGraph(int(nodes), int(edges))
+                newWindow.destroy()
         # Create new Window
-        newWindow = tk.Toplevel(self.master)
+        newWindow = tk.Toplevel(self)
         newWindow.title("Create Graph")
-        newWindow.geometry("250x150")
+        newWindow.geometry("250x160")
         newWindow.resizable(width=0, height=0)
-
-        #Create a validation function for the entries
-        validate = newWindow.register(validate_input)
-
+        
         # Create widgets
         label1 = tk.Label(newWindow, text="Nº of Nodes:")
         label2 = tk.Label(newWindow, text="Nº of Edges:")
-        entry1 = tk.Entry(newWindow, width=10, validate="key", validatecommand=(validate, "%P", entry1))
-        entry2 = tk.Entry(newWindow, width=10, validate="key", validatecommand=(validate, "%P", entry2))
-        button = tk.Button(newWindow, text="Create Graph", padx=8, pady=6, command=getNodesEdges)
+        button1 = tk.Button(newWindow, text="Accept", padx=8, pady=6, command=checkGraph)
+        button2 = tk.Button(newWindow, text="Cancel", padx=8, pady=6, command=newWindow.destroy)
+        entry1 = tk.Entry(newWindow)
+        entry1.insert(0, 10)
+        entry1.place(x=90, y=20)
+        entry2 = tk.Entry(newWindow)
+        entry2.insert(0, 20)
+        entry2.place(x=90, y=60)
 
         # Place Widgets
         label1.place(x=15, y=20)
         label2.place(x=15, y=60)
-        entry1.place(x=90, y=20)
-        entry2.place(x=90, y=60)
-        button.place(relx=.5, y=120, anchor="center")
-        
+        button1.place(x=25, y=110)
+        button2.place(x=165, y=110)
         
         
 

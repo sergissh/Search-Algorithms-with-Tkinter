@@ -6,43 +6,37 @@ from networkx.drawing.nx_agraph import graphviz_layout
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 
+from graph import Graph
 class Body(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
         self.master = master
         self.body_width = 970
-        self.configure(width=self.body_width, bg='lightblue')
+        self.configure(width=self.body_width)
         self.place(x=231, y=0, relheight=1)
-        self.showGraph()
+        self.graph = None
 
+    def createGraph(self, num_nodes, num_edges):
+        self.graph = Graph(num_nodes=num_nodes, num_edges=num_edges)
+        self.displayGraph()
         self.canvas_widget.bind("<MouseWheel>", self.zoom)
         self.canvas_widget.bind("<ButtonPress-1>", self.on_mouse_press)
         self.canvas_widget.bind("<B1-Motion>", self.on_mouse_drag)
 
-    def showGraph(self):
-        #Creating Graph
-        G = nx.Graph()
-        num_nodes = 10
-        G.add_nodes_from(range(num_nodes))
-        for u in G.nodes():
-            for v in G.nodes():
-                if u != v and not G.has_edge(u, v):
-                    distance = random.uniform(1.0, 10.0)
-                    G.add_edge(u, v, weight=distance)
-
-
+    def displayGraph(self):
         # Layout the graph
-        pos = nx.spring_layout(G)
+        pos = nx.spring_layout(self.graph.graph)
 
         # Create a Matplotlib figure and plot the network graph
         self.fig, self.ax = plt.subplots()
-        nx.draw(G, pos, with_labels=True, ax=self.ax)
+        nx.draw(self.graph.graph, pos, with_labels=True, ax=self.ax)
 
         # Create a FigureCanvasTkAgg widget to display the graph in the tkinter frame
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas_widget = self.canvas.get_tk_widget()
         #self.canvas_widget.pack(fill=tk.BOTH, expand=True)
         self.canvas_widget.place(x= 0, y=0, width=self.body_width, relheight=1)
+        
 
     def zoom(self, event):
         zoom_factor = 0.8
