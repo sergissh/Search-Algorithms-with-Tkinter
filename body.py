@@ -5,8 +5,17 @@ import random
 from networkx.drawing.nx_agraph import graphviz_layout
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
+from matplotlib.patches import FancyBboxPatch
 
 from graph import Graph
+
+class InfoWindow(tk.Frame):
+    def __init__(self, master=None):
+        super().__init__(master)
+        self.master = master
+        self.configure(bg="lightblue", width=100)
+        self.pack(anchor="nw")
+        node_label = tk.Label(self, text="node"+str(2)).pack()
 class Body(tk.Frame):
     def __init__(self, master=None):
         super().__init__(master)
@@ -15,6 +24,7 @@ class Body(tk.Frame):
         self.configure(width=self.body_width)
         self.place(x=231, y=0, relheight=1)
         self.graph = None
+        #self.info_window = InfoWindow(self)
 
     def createGraph(self, num_nodes, num_edges):
         self.graph = Graph(num_nodes=num_nodes, num_edges=num_edges)
@@ -34,10 +44,22 @@ class Body(tk.Frame):
         # Create a FigureCanvasTkAgg widget to display the graph in the tkinter frame
         self.canvas = FigureCanvasTkAgg(self.fig, master=self)
         self.canvas_widget = self.canvas.get_tk_widget()
-        #self.canvas_widget.pack(fill=tk.BOTH, expand=True)
         self.canvas_widget.place(x= 0, y=0, width=self.body_width, relheight=1)
+        edge_labels = {(u, v): self.graph.graph[u][v]['weight'] for u, v in self.graph.graph.edges()}
+        distance = .01
+        for edge, label in edge_labels.items():
+            x1, y1 = pos[edge[0]]
+            x2, y2 = pos[edge[1]]
+            x = (x1 + x2) / 2
+            y = (y1 + y2) / 2
+            dx = x2 - x1
+            dy = y2 - y1
+            # **0.5 == sqrt()
+            length = (dx**2 + dy**2)**0.5
+            x_par = x + (distance / length) * dy
+            y_par = y + (distance / length) * dx
+            plt.annotate(label, (x_par, y_par), fontsize=11, ha="center", va='center', backgroundcolor="w")
         
-
     def zoom(self, event):
         zoom_factor = 0.8
         x, y = event.x, event.y
@@ -48,9 +70,16 @@ class Body(tk.Frame):
         if event.delta > 0:
             self.ax.set_xlim(xdata - (xdata - xlim[0]) * zoom_factor, xdata + (xlim[1] - xdata) * zoom_factor)
             self.ax.set_ylim(ydata - (ydata - ylim[0]) * zoom_factor, ydata + (ylim[1] - ydata) * zoom_factor)
+
         elif event.delta < 0:
             self.ax.set_xlim(xdata - (xdata - xlim[0]) / zoom_factor, xdata + (xlim[1] - xdata) / zoom_factor)
             self.ax.set_ylim(ydata - (ydata - ylim[0]) / zoom_factor, ydata + (ylim[1] - ydata) / zoom_factor)
+        
+        originalFontSize = 11
+        newFontSize = originalFontSize * zoom_factor
+        for text in self.ax.texts:
+            text.set_fontsize(newFontSize)
+        
         self.canvas.draw()
 
     def on_mouse_press(self, event):

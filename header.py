@@ -53,6 +53,7 @@ class Header(tk.Frame):
         # Create the second button and center it in the frame
         button2 = tk.Button(section1, text="Load Graph", padx=8, pady=6)
         button2.grid(row=1, column=2, sticky=tk.N + tk.E + tk.W + tk.S, padx=10, pady=10)
+        
 
     def initializeNodesSection(self):
         #Section 2
@@ -142,6 +143,10 @@ class Header(tk.Frame):
             edges = entry2.get()
             if not nodes.isdigit() or not edges.isdigit():
                 showwarning(title="Error", message="Enter an Integer")
+            elif int(nodes) <= 1:
+                showwarning(title="Error", message="Nodes must be higher than 1")
+            elif int(edges) < int(nodes) - 1:
+                showwarning(title="Error", message="Number of Edges must me higher")
             else:
                 body.createGraph(int(nodes), int(edges))
                 newWindow.destroy()
