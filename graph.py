@@ -15,11 +15,12 @@ class Graph():
         while True:
             self.graph = nx.gnm_random_graph(num_nodes, num_edges)
             for u, v in self.graph.edges():
-                self.graph[u][v]['weight'] = random.randint(1, 10) 
-
+                self.graph[u][v]['weight'] = random.randint(1, 10)  
             #check for isolated nodes
             isolated_nodes = [node for node in self.graph.nodes() if self.graph.degree(node) == 0]
-            if not isolated_nodes: 
+            if not isolated_nodes:
+                self.node_labels = {node: f"V{node}" for node in self.graph.nodes()}
+                print(self.node_labels)
                 break
 
         

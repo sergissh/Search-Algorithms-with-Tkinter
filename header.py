@@ -33,6 +33,12 @@ class Header(tk.Frame):
 
     def initializeGraphSection(self):
         
+        def checkboxAction():
+            body = section1.master.master.body
+            if boolCheck1.get() == 1:
+                body.displayDistances(True)
+            else:
+                body.displayDistances(False)
         #Section 1
         section1 = tk.Frame(self, width=self.winfo_screenmmwidth(), pady=10)
         section1.pack(fill=tk.X)
@@ -54,6 +60,10 @@ class Header(tk.Frame):
         button2 = tk.Button(section1, text="Load Graph", padx=8, pady=6)
         button2.grid(row=1, column=2, sticky=tk.N + tk.E + tk.W + tk.S, padx=10, pady=10)
         
+        # Create the display distances checkbox in the frame
+        boolCheck1 = tk.IntVar()
+        checkbox = tk.Checkbutton(section1, text="Disp. Distances", padx=8, pady=6, variable=boolCheck1, font=('Helvetica', 8), command=checkboxAction)
+        checkbox.grid(row=2, column=1, sticky=tk.N + tk.E + tk.W + tk.S, padx=10, pady=10)
 
     def initializeNodesSection(self):
         #Section 2
@@ -150,6 +160,7 @@ class Header(tk.Frame):
             else:
                 body.createGraph(int(nodes), int(edges))
                 newWindow.destroy()
+
         # Create new Window
         newWindow = tk.Toplevel(self)
         newWindow.title("Create Graph")
